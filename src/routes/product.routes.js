@@ -1,40 +1,46 @@
 import express from "express";
-import productControllers from "../controllers/product.controllers.js";
+
+import productController from "../controllers/product.controller.js";
+import logger from "../middlewares/logger.js";
 import auth from "../middlewares/auth.js";
 import roleBasedAuth from "../middlewares/roleBasedAuth.js";
+import { ROLE_ADMIN, ROLE_MERCHANT } from "../constants/roles.js";
 import validate from "../middlewares/validator.js";
 import { productSchema } from "../libs/schemas/product.schema.js";
 
 const router = express.Router();
 
-router.get("/", productControllers.getProducts);
+router.get("/", productController.getAllProducts);
 
-router.get("/brands", productControllers.getBrands);
+router.get("/brands", productController.getBrands);
 
-router.get("/categories", productControllers.getCategories);
+router.get("/categories", productController.getCategories);
 
-router.get("/:id", productControllers.getProductById);
+router.get("/count", productController.getTotalCount);
+
+// Dynamic route (:param)
+router.get("/:id", productController.getProductById);
 
 router.post(
   "/",
   auth,
-  roleBasedAuth("MERCHANT"),
+  roleBasedAuth(ROLE_MERCHANT),
   validate(productSchema),
-  productControllers.createProduct,
+  productController.createProduct,
 );
 
 router.put(
   "/:id",
   auth,
-  roleBasedAuth("MERCHANT"),
-  productControllers.updateProduct,
+  roleBasedAuth(ROLE_MERCHANT),
+  productController.updateProduct,
 );
 
 router.delete(
   "/:id",
   auth,
-  roleBasedAuth("MERCHANT"),
-  productControllers.deleteProduct,
+  roleBasedAuth(ROLE_MERCHANT),
+  productController.deleteProduct,
 );
 
 export default router;

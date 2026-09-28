@@ -1,27 +1,28 @@
-import connectCloudinary from "../config/cloudinary.js";
+import { v2 as cloudinary } from "cloudinary";
 
 async function uploadFile(files) {
-    const uploadedFiles=[];
+  const uploadedFiles = [];
+
   for (const file of files) {
- const result = await new Promise((resolve, reject) => {
-            connectCloudinary().uploader
-      .upload_stream(
-        {
-          folder: "206189",
-          allowed_formats: ["jpg", "jpeg", "png", "webp"],
-        },
-        (error, data) => {
-          if (error) return reject(error);
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "20260320",
+            allowed_formats: ["jpg", "png", "webp"],
+          },
+          (error, data) => {
+            if (error) return reject(error);
 
-          resolve (data);
-        },
-      )
-      .end(file.buffer);
-        
-    })
+            resolve(data);
+          },
+        )
+        .end(file.buffer);
+    });
+
     uploadedFiles.push(result);
-
   }
+
   return uploadedFiles;
 }
 

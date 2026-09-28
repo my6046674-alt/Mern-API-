@@ -1,31 +1,24 @@
-import product from "../models/Product.js";
+import { ROLE_ADMIN } from "../constants/roles.js";
+import Product from "../models/Product.js";
 import uploadFile from "../utils/fileUploader.js";
 
 const getAllProducts = async (query) => {
-  const sort = query.sort ? JSON.parse(query.sort) : {};
-  const limit = Number(query.limit ?? 10);
-  const offset = Number(query.offset ?? 0);
+  const sort = query?.sort ? JSON.parse(query.sort) : {};
+  const limit = query?.limit ?? 10;
+  const offset = query?.offset ?? 0;
 
   const filters = {};
- 
+
   const { category, brands, name, min, max, createdBy } = query;
 
-  if (category) filters.category = category.trim();
-  if (brands) {
-    filters.brand = {
-      $in: brands
-        .split(",")
-        .map((brand) => brand.trim())
-        .filter(Boolean),
-    };
-  }
-  if (name) filters.name = { $regex: name, $options: "i" };
+  if (category) filters.category = category;
+  if (brands) filters.brand = { $in: brands.split(",") };
+  if (name) filters.name = { $regex: name, $options: "i" }; // Ilike match
   if (min) filters.price = { $gte: min };
   if (max) filters.price = { ...filters.price, $lte: max };
   if (createdBy) filters.createdBy = createdBy;
 
-  const products = await product
-    .find(filters)
+  const products = await Product.find(filters)
     .sort(sort)
     .limit(limit)
     .skip(offset);
@@ -34,42 +27,62 @@ const getAllProducts = async (query) => {
 };
 
 const getProductById = async (id) => {
-  const foundProduct = await product.findById(id);
+  const product = await Product.findById(id);
 
-  return foundProduct;
+  return product;
 };
 
 const createProduct = async (data, files, userId) => {
   const uploadedFiles = await uploadFile(files);
 
-  return await product.create({
+  return await Product.create({
     ...data,
+    description: data.description,
     imageUrls: uploadedFiles.map((file) => file.url),
     createdBy: userId,
   });
 };
+
 const updateProduct = async (id, input, files) => {
   const updateData = input;
 
   if (files && files.length > 0) {
-    const uploadedFilles = await uploadFile(files);
-    updateData.imageUrls = uploadedFilles.map((file) => file.url);
+    const uploadedFiles = await uploadFile(files);
+
+    updateData.imageUrls = uploadedFiles.map((file) => file.url);
   }
-  return await product.findByIdAndUpdate(id, updateData, { new: true });
+
+  return await Product.findByIdAndUpdate(id, updateData, {
+    returnDocument: "after",
+  });
 };
 
+const deleteProduct = async (id, authUser) => {
+  const product = await getProductById(id);
 
-const deleteProduct = async (id) => {
-  return await product.findByIdAndDelete(id);
+  if (
+    authUser._id !== product.createdBy.toString() &&
+    !authUser.roles.includes(ROLE_ADMIN)
+  ) {
+    throw {
+      status: 403,
+      message: "Access denied.",
+    };
+  }
+
+  await Product.findByIdAndDelete(id);
 };
+
 const getBrands = async () => {
-  return await product.distinct("brand");
+  return await Product.distinct("brand");
 };
+
 const getCategories = async () => {
-  return await product.distinct("category");
+  return await Product.distinct("category");
 };
+
 const getTotalCount = async () => {
-  return await product.countDocuments();
+  return await Product.countDocuments();
 };
 
 export default {

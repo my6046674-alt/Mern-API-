@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 import {
   PAYMENT_METHOD_CARD,
   PAYMENT_METHOD_CASH,
@@ -13,7 +12,7 @@ const paymentSchema = new mongoose.Schema({
   transactionId: String,
   amount: {
     type: Number,
-    required: [true, "payment amount is required"],
+    required: [true, "Payment amount is required."],
   },
   method: {
     type: String,
@@ -31,9 +30,9 @@ const paymentSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now,
+    default: Date.now(),
     immutable: true,
   },
 });
 
-export default mongoose.model("payment", paymentSchema);
+export default mongoose.model("Payment", paymentSchema);

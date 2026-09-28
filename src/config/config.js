@@ -5,7 +5,7 @@ dotenv.config();
 const config = {
     appUrl: process.env.APP_URL || "http://localhost:8000",
 
-    port: Number(process.env.PORT) || 8000,
+    port: Number(process.env.PORT) ||8000,
 
     mongodbUrl: process.env.MONGODB_URL || process.env.MONGODB_URL || "",
 
@@ -22,8 +22,7 @@ const config = {
         secretKey: process.env.KHALTI_SECRET_KEY || "",
         return_url: process.env.KHALTI_RETURN_URL || "",
     },
-    resendEmailApiKey: process.env.RESEND_EMAIL_API_KEY || "",
-    geminiApiKey: process.env.GEMINI_API_KEY || "",
+    // geminiApiKey: process.env.GEMINI_API_KEY || "",
 };
 
 export default config;

@@ -1,63 +1,40 @@
-import authServices from "../services/auth.services.js";
+import authService from "../services/auth.service.js";
 import jwt from "../utils/jwt.js";
 
 const login = async (req, res) => {
-  try {
-    const data = await authServices.login(req.body);
+  const input = req.body;
 
-    const token = jwt.generateToken(data);
+  try {
+    const user = await authService.login(req.body);
+
+    const token = jwt.createToken(user);
 
     res.cookie("authToken", token, {
-      maxAge: 86400 * 1000, // 1 day in milliseconds
+      maxAge: 86400 * 1000,
     });
 
-    res.json(data);
+    res.json({ ...user, token });
   } catch (error) {
-    console.log(error);
-    res.status(error.statusCode || 400).json({ message: error.message });
+    res.status(error.status || 400).send(error.message);
   }
 };
 
 const register = async (req, res) => {
-  try {
-    const data = await authServices.register(req.body);
+  const input = req.body;
 
-    const token = jwt.generateToken(data);
+  try {
+    const user = await authService.register(input);
+
+    const token = jwt.createToken(user);
 
     res.cookie("authToken", token, {
-      maxAge: 86400 * 1000, // 1 day in milliseconds
+      maxAge: 86400 * 1000,
     });
 
-    res.json(data);
+    res.json({ ...user, token });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(error.status || 400).send(error.message);
   }
 };
 
-const logout = (req, res) => {
-  res.clearCookie("authToken");
-
-  res.json({ message: "Logout succcessful" });
-};
-
-const forgotPassword = async (req, res) => {
-  try {
-    const data = await authServices.forgotPassword(req.body);
-
-    res.json(data);
-  } catch (error) {
-    res.status(error.statusCode || 400).json({ message: error.message });
-  }
-};
-
-const resetPassword = async (req, res) => {
-  try {
-    const data = await authServices.resetPassword(req.body);
-
-    res.json(data);
-  } catch (error) {
-    res.status(error.statusCode || 400).json({ message: error.message });
-  }
-};
-
-export default { login, register, logout, forgotPassword, resetPassword };
+export default { register, login };

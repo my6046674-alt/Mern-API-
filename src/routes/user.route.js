@@ -1,66 +1,23 @@
 import express from "express";
-import userController from "../controllers/user.controllers.js";
-import validate from "../middlewares/validator.js";
-import {
-  updatePasswordSchema,
-  userSchema,
-} from "../libs/schemas/user.schema.js";
-import auth from "../middlewares/auth.js";
-import roleBasedAuth from "../middlewares/roleBasedAuth.js";
+
+import userController from "../controllers/user.controller.js";
 import { ROLE_ADMIN } from "../constants/roles.js";
+import roleBasedAuth from "../middlewares/roleBasedAuth.js";
 
 const router = express.Router();
 
-router.get("/", auth, roleBasedAuth(ROLE_ADMIN), userController.getUsers);
+router.get("/", roleBasedAuth(ROLE_ADMIN), userController.getAllUsers);
 
-router.get("/me", auth, userController.getAuthUser);
+router.put("/profile-image", userController.updateProfileImage);
 
-// Dynamic route params
-router.get(
-  "/:userId",
-  auth,
-  roleBasedAuth(ROLE_ADMIN),
-  userController.getUserById,
-);
+router.get("/:id", userController.getById);
 
-router.post(
-  "/",
-  auth,
-  roleBasedAuth(ROLE_ADMIN),
-  validate(userSchema),
-  userController.createUser,
-);
+router.post("/", roleBasedAuth(ROLE_ADMIN), userController.createUser);
 
-router.put("/profile-image", auth, userController.updateProfileImage);
+router.put("/:id", userController.updateUser);
 
-router.put("/me", auth, userController.updateAuthUser);
+router.delete("/:id", roleBasedAuth(ROLE_ADMIN), userController.deleteUser);
 
-router.put(
-  "/:userId",
-  auth,
-  roleBasedAuth(ROLE_ADMIN),
-  userController.updateUser,
-);
-
-router.put(
-  "/me/change-password",
-  auth,
-  validate(updatePasswordSchema),
-  userController.updateAuthUserPassword,
-);
-
-router.put(
-  "/:userId/change-password",
-  auth,
-  roleBasedAuth(ROLE_ADMIN),
-  userController.updatePassword,
-);
-
-router.delete(
-  "/:userId",
-  auth,
-  roleBasedAuth(ROLE_ADMIN),
-  userController.deleteUser,
-);
+router.patch("/:id/roles", roleBasedAuth(ROLE_ADMIN), userController.updateUserRoles);
 
 export default router;

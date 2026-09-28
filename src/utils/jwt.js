@@ -1,16 +1,16 @@
-import jwt from 'jsonwebtoken';
-import config from "../config/config.js"
+import jwt from "jsonwebtoken";
+import config from "../config/config.js";
 
-const createToken =(data)=>{
-  const token =  jwt.sign(data, config.jwtSecret, {
+const createToken = (data) => {
+  const token = jwt.sign(data, config.jwtSecret, {
     expiresIn: "30d",
   });
 
   return token;
 };
 
-const verifyToken =(token)=>{
-   return jwt.verify(token, config.jwtSecret);
+const verifyToken = (token) => {
+  return jwt.verify(token, config.jwtSecret);
 };
 
-export default { createToken, verifyToken};
+export default { createToken, verifyToken };

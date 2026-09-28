@@ -1,16 +1,7 @@
-const roleBasedAuth = (role)=> (req, res, next)=>{
+const roleBasedAuth = (role) => (req, res, next) => {
+  if (req.user.roles.includes(role)) return next();
 
-    const userRoles = req.user?.role ?? req.user?.roles;
-    const hasRole = Array.isArray(userRoles)
-        ? userRoles.includes(role)
-        : userRoles === role;
+  res.status(403).send("Access denied.");
+};
 
-    if(hasRole) return next();
-
-    res.status(403).send("Access denied.");
-
-}
-
-
-export default roleBasedAuth;  
-
+export default roleBasedAuth;

@@ -23,7 +23,7 @@ const orderSchema = new mongoose.Schema({
       quantity: {
         type: Number,
         default: 1,
-        min: [1, "Quantity must be at last 1."],
+        min: [1, "Quantity must be at least 1."],
       },
     },
   ],
@@ -40,8 +40,8 @@ const orderSchema = new mongoose.Schema({
   },
   shippingAddress: {
     city: {
-      type: String,
       required: true,
+      type: String,
     },
     province: String,
     street: String,
@@ -60,11 +60,11 @@ const orderSchema = new mongoose.Schema({
   },
   payment: {
     type: mongoose.Schema.ObjectId,
-    ref: "payment",
+    ref: "Payment",
   },
   createdDate: {
     type: Date,
-    default: Date.now,
+    default: Date.now(),
     immutable: true,
   },
 });

@@ -1,10 +1,10 @@
 const logger = (req, res, next) => {
-    const url = req.originalUrl;
-    const method = req.method;
+  const url = req.originalUrl;
+  const method = req.method;
 
-    console.log(`${method}: ${url}`)
+  console.log(`${method}: ${url}`);
 
-    next();
+  next();
 };
 
 export default logger;

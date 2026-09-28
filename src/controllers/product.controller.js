@@ -1,94 +1,89 @@
-import productServices from "../services/product.services.js";
-import uploadFiles from "../utils/fileUploader.js";
+import productService from "../services/product.service.js";
 
-const createProduct = async (req, res) => {
-  try {
-    const createdProduct = await productServices.createProduct(
-      req.body,
-      req.files,
-      req.user._id,
-    );
+const getAllProducts = async (req, res) => {
+  const products = await productService.getAllProducts(req.query);
 
-    res.status(201).json(createdProduct);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const getProducts = async (req, res) => {
-  try {
-    const products = await productServices.getProducts(req.query);
-
-    res.json(products);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const getBrands = async (req, res) => {
-  try {
-    const brands = await productServices.getBrands();
-
-    res.json(brands);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const getCategories = async (req, res) => {
-  try {
-    const categories = await productServices.getCategories();
-
-    res.json(categories);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+  res.json(products);
 };
 
 const getProductById = async (req, res) => {
+  const id = req.params.id;
+
+  const product = await productService.getProductById(id);
+
+  if (!product) return res.status(404).json({ message: "Product not found." });
+
+  res.json(product);
+};
+
+const createProduct = async (req, res) => {
+  const userId = req.user._id;
+
   try {
-    const product = await productServices.getProductById(req.params.id);
+    const product = await productService.createProduct(
+      req.body,
+      req.files,
+      userId,
+    );
 
     res.json(product);
   } catch (error) {
-    res.status(error.statusCode || 400).json({ message: error.message });
+    res.status(400).send(error.message);
   }
 };
 
 const updateProduct = async (req, res) => {
+  const id = req.params.id;
+  const input = req.body;
+
   try {
-    const product = await productServices.updateProduct(
-      req.params.id,
-      req.body,
-      req.user._id,
-      req.files,
-    );
+    const product = await productService.updateProduct(id, input, req.files);
 
     res.json(product);
   } catch (error) {
-    res.status(error.statusCode || 400).json({ message: error.message });
+    res.status(400).send(error.message);
   }
 };
 
 const deleteProduct = async (req, res) => {
-  try {
-    const data = await productServices.deleteProduct(
-      req.params.id,
-      req.user._id,
-    );
+  const id = req.params.id;
 
-    res.json(data);
+  try {
+    await productService.deleteProduct(id, req.user);
+
+    res.json({
+      message: "Product deleted successfully.",
+    });
   } catch (error) {
-    res.status(error.statusCode || 400).json({ message: error.message });
+    res.status(400).send(error.message);
   }
 };
 
+const getBrands = async (req, res) => {
+  const brands = await productService.getBrands();
+
+  res.json(brands);
+};
+
+const getCategories = async (req, res) => {
+  const categories = await productService.getCategories();
+
+  res.json(categories);
+};
+
+const getTotalCount = async (req, res) => {
+  const count = await productService.getTotalCount();
+
+  res.json(count);
+};
+
 export default {
-  createProduct,
-  getProducts,
+  getAllProducts,
   getProductById,
+  createProduct,
   updateProduct,
   deleteProduct,
   getBrands,
   getCategories,
+  getTotalCount,
 };
