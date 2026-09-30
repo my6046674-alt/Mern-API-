@@ -11,7 +11,7 @@ import {
   PAYMENT_STATUS_SUCCESS,
 } from "../constants/payment.js";
 import Order from "../models/Order.js";
-import Payment from "../models/Payment.js";
+import Payment from "../models/payment.js";
 import { payViaKhalti, payViaStripe } from "../utils/payment.js";
 import userService from "./user.service.js";
 
