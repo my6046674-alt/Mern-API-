@@ -10,8 +10,13 @@ import connectDB from "./config/database.js";
 import logger from "./middlewares/logger.js";
 import connectCloudinary from "./config/cloudinary.js";
 import productServices from "./services/product.service.js";
+import dns from "dns"
+
+
 
 const app = express();
+dns.setServers(["1.1.1.1", "8.8.8.8"])
+
 
 const upload = multer({
   storage: multer.memoryStorage(),
