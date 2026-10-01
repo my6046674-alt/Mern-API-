@@ -1,4 +1,8 @@
-import { ROLE_ADMIN, ROLE_SUPER_ADMIN } from "../constants/roles.js";
+import {
+  ROLE_ADMIN,
+  ROLE_CUSTOMER,
+  ROLE_SUPER_ADMIN,
+} from "../constants/roles.js";
 import User from "../models/User.js";
 import uploadFile from "../utils/fileUploader.js";
 import authService from "./auth.service.js";
@@ -30,8 +34,20 @@ const getById = async (id, authUser) => {
   return await User.findById(id);
 };
 
-const createUser = async (data) => {
-  return await authService.register(data);
+const createUser = async (data, authUser) => {
+  const roles = data.roles ?? [ROLE_CUSTOMER];
+
+  if (
+    (roles.includes(ROLE_ADMIN) || roles.includes(ROLE_SUPER_ADMIN)) &&
+    !authUser.roles.includes(ROLE_SUPER_ADMIN)
+  ) {
+    throw {
+      status: 403,
+      message: "Only a super admin can assign admin roles.",
+    };
+  }
+
+  return await authService.register({ ...data, roles }, { preserveRoles: true });
 };
 
 const updateUser = async (id, data, authUser) => {
