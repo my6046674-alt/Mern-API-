@@ -3,8 +3,18 @@ import Stripe from "stripe";
 import config from "../config/config.js";
 
 const payViaKhalti = async (data) => {
+  const apiUrl = config.khalti.apiUrl;
+  const secretKey = config.khalti.secretKey;
+  const returnUrl = config.khalti.return_url || `${config.appUrl}/payment/khalti`;
+
+  if (!apiUrl || !secretKey) {
+    throw new Error(
+      "Khalti is not configured. Add KHALTI_API_URL and KHALTI_SECRET_KEY to your .env file.",
+    );
+  }
+
   const body = {
-    return_url: `${config.khalti.returnUrl}/${data.id}`,
+    return_url: `${returnUrl.replace(/\/$/, "")}/${data.id}`,
     website_url: config.appUrl,
     amount: data.amount,
     purchase_order_id: data.purchaseOrderId,
@@ -12,9 +22,9 @@ const payViaKhalti = async (data) => {
     customer_info: data.customerInfo,
   };
 
-  const response = await axios.post(config.khalti.apiUrl, body, {
+  const response = await axios.post(apiUrl, body, {
     headers: {
-      Authorization: `Key ${config.khalti.secretKey}`,
+      Authorization: `Key ${secretKey}`,
     },
   });
 

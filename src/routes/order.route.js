@@ -1,4 +1,5 @@
 import express from "express";
+import auth from "../middlewares/auth.js";
 import orderController from "../controllers/order.controller.js";
 import roleBasedAuth from "../middlewares/roleBasedAuth.js";
 import {
@@ -9,60 +10,68 @@ import {
 
 const router = express.Router();
 
-router.get("/", roleBasedAuth(ROLE_ADMIN), orderController.getOrders);
+router.get("/", auth, roleBasedAuth(ROLE_ADMIN), orderController.getOrders);
 
 router.get(
   "/user",
+  auth,
   roleBasedAuth(ROLE_CUSTOMER),
   orderController.getOrdersByUser,
 );
 
 router.get(
   "/merchant",
+  auth,
   roleBasedAuth(ROLE_MERCHANT),
   orderController.getOrdersByMerchant,
 );
 
-router.get("/:id", orderController.getOrderById);
+router.get("/:id", auth, orderController.getOrderById);
 
-router.post("/", roleBasedAuth(ROLE_CUSTOMER), orderController.createOrder);
+router.post("/", auth, roleBasedAuth(ROLE_CUSTOMER), orderController.createOrder);
 
 router.put(
   "/:id/status",
+  auth,
   roleBasedAuth(ROLE_ADMIN),
   orderController.updateOrderStatus,
 );
 
 router.patch(
   "/:id/cancel",
+  auth,
   roleBasedAuth(ROLE_CUSTOMER),
   orderController.cancelOrder,
 );
 
 router.put(
   "/:id/confirm",
+  auth,
   roleBasedAuth(ROLE_CUSTOMER),
   orderController.confirmOrder,
 );
 
 router.put(
   "/:id/payment/cash",
+  auth,
   roleBasedAuth(ROLE_CUSTOMER),
   orderController.orderPaymentViaCash,
 );
 
 router.put(
   "/:id/payment/khalti",
+  auth,
   roleBasedAuth(ROLE_CUSTOMER),
   orderController.orderPaymentViaKhalti,
 );
 
 router.put(
   "/:id/payment/stripe",
+  auth,
   roleBasedAuth(ROLE_CUSTOMER),
   orderController.orderPaymentViaStripe,
 );
 
-router.delete("/:id", roleBasedAuth(ROLE_ADMIN), orderController.deleteOrder);
+router.delete("/:id", auth, roleBasedAuth(ROLE_ADMIN), orderController.deleteOrder);
 
 export default router;
